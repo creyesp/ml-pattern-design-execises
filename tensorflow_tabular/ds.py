@@ -32,14 +32,28 @@ def initial_bias(target):
     return initial_bias
 
 
+def class_weight(target):
+    pos = (target).sum()
+    neg = (target==0).sum()
+    total = pos + neg
+    weight_for_0 = (1 / neg) * (total / 2.0)
+    weight_for_1 = (1 / pos) * (total / 2.0)
+
+    class_weight = {0: weight_for_0, 1: weight_for_1}
+
+    return class_weight
+
+
+
 def describe_dataset(features, target):
     num_desc = features[NUMERICAL_COLUMNS].apply(lambda x: {'mean': x.mean(), 'variance': x.var()})
     cat_desc = features[CATEGORICAL_COLUMNS].apply(lambda x: {'vocabulary': x.unique()})
-    bias = initial_bias(target)
+
     description = {
         'numerical': dict(num_desc),
         'categorical': dict(cat_desc),
-        'bias': bias
+        'bias': initial_bias(target),
+        'class_weight': class_weight(target),
     }
     return description
 

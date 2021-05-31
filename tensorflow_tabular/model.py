@@ -102,7 +102,9 @@ tf.keras.utils.plot_model(model, show_shapes=False)
 #%%
 history = model.fit(ds_train,
           validation_data=ds_test,
-          epochs=1,)
+          epochs=5,
+          class_weight=data_description['class_weight'],
+          )
 #%%
 print(history.history)
 #%%

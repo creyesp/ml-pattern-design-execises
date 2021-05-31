@@ -8,6 +8,7 @@ CATEGORICAL_COLUMNS = [
 NUMERICAL_COLUMNS = [
     # 'user_orders_30_days_same_partner',
     # 'total_amount_euros',
+
     # 'shipping_amount_euros',
     # 'commission',
     # 'online_payment',
