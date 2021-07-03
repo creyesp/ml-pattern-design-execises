@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -7,9 +9,10 @@ from config import NUMERICAL_COLUMNS, CATEGORICAL_COLUMNS, COLUMNS, TARGET
 
 
 def load_dataset(file_path):
-    data = pd.read_csv(file_path)
+    #data = pd.read_csv(file_path)
+    data = pd.concat([pd.read_csv(f'{file_path}{file_}') for file_ in os.listdir(file_path) if file_.endswith('gz')]).reset_index(drop=True)
     data.dropna(subset=COLUMNS, inplace=True)
-    #pd.concat([pd.read_csv(f'/home/creyesp/tmp/tabular/data/{file_}') for file_ in os.listdir('/home/creyesp/tmp/tabular/data/') if file_.endswith('gz')]).reset_index(drop=True)
+    
 
     dataset = data[COLUMNS]
     target_class = (data[TARGET]==0).astype(int)
@@ -61,9 +64,9 @@ def tf_dataset(features, target, train=False):
     ds_train = tf.data.Dataset.from_tensor_slices((dict(features), target))
 
     if train:
-        ds_train = ds_train.shuffle(buffer_size=1_00_000)
+        ds_train = ds_train.shuffle(buffer_size=5_00_000)
     
-    ds_train = ds_train.batch(2048, num_parallel_calls=tf.data.AUTOTUNE)
+    ds_train = ds_train.batch(1024, num_parallel_calls=tf.data.AUTOTUNE)
     
     return ds_train
 

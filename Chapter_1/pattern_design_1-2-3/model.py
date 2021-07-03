@@ -1,6 +1,6 @@
 #%%
 import sys
-sys.path.insert(0, "/home/creyesp/Projects/repos/personal/training/tensorflow_tabular")
+sys.path.insert(0, "/home/creyesp/Projects/repos/personal/ml-pattern-design-execises/tensorflow_tabular/")
 #%%
 import os
 import tensorflow as tf
@@ -28,6 +28,7 @@ METRICS = [
 ]
 #%%
 file_path = '/home/creyesp/tmp/tabular/data/commit_tabular_000000000000.csv.gz'
+file_path = '/home/creyesp/tmp/tabular/data/'
 ds_train, ds_test, data_description = ds.get_dataset(file_path)
 
 #%%
@@ -72,7 +73,7 @@ for column in ['restaurant_id']:
     input_embedding = tf.keras.Input(shape=(1,), name=f'input_{column}', dtype='int32')
     vocabulary = data_description['categorical'][column]['vocabulary']
     restaurant_id_type = tf.feature_column.categorical_column_with_vocabulary_list(column, vocabulary_list=vocabulary)
-    restaurant_id_embedding = tf.feature_column.embedding_column(restaurant_id_type, dimension=64)
+    restaurant_id_embedding = tf.feature_column.embedding_column(restaurant_id_type, dimension=512)
     embedding_inputs[column] = input_embedding
     embedding_features.append(restaurant_id_embedding)
 embedding_layer = tf.keras.layers.DenseFeatures(embedding_features)(embedding_inputs)
@@ -87,8 +88,13 @@ inputs.update(categorical_inputs)
 inputs.update(numerical_inputs)
 
 feature_layer = tf.keras.layers.concatenate(categorical_features + numerical_features + [embedding_layer])
-dense_layer = tf.keras.layers.Dense(128, activation='relu')(feature_layer)
-dense_layer = tf.keras.layers.Dense(128, activation='relu')(dense_layer)
+dense_layer = tf.keras.layers.Dense(512, activation='relu')(feature_layer)
+# dense_layer = tf.keras.layers.Dropout(rate=0.3)(dense_layer)
+dense_layer = tf.keras.layers.Dense(512, activation='relu')(dense_layer)
+# dense_layer = tf.keras.layers.Dropout(rate=0.3)(dense_layer)
+dense_layer = tf.keras.layers.Dense(512, activation='relu')(dense_layer)
+# dense_layer = tf.keras.layers.Dropout(rate=0.3)(dense_layer)
+dense_layer = tf.keras.layers.Dense(512, activation='relu')(dense_layer)
 output_bias = tf.keras.initializers.Constant([initial_bias])
 output = tf.keras.layers.Dense(1, activation='sigmoid', bias_initializer=output_bias)(feature_layer)
 
@@ -102,7 +108,7 @@ tf.keras.utils.plot_model(model, show_shapes=False)
 #%%
 history = model.fit(ds_train,
           validation_data=ds_test,
-          epochs=5,
+          epochs=3,
           class_weight=data_description['class_weight'],
           )
 #%%
